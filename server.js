@@ -16,10 +16,10 @@ app.get("/notes", function(req, res){
     res.sendFile(path.join(__dirname, "/public/notes.html"));
 });
 
-app.get("*", function(req, res){
-    res.sendFile(path.join(__dirname, "/public/index.html"));
-    // console.log("home");
-});
+// app.get("*", function(req, res){
+//     res.sendFile(path.join(__dirname, "/public/index.html"));
+//     // console.log("home");
+// });
 
 app.get("/api/notes", function (req, res) {
     const notesList = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
@@ -41,15 +41,25 @@ app.post("/api/notes", function (req, res) {
 
 app.delete("/api/notes/:id", function (req, res) {
     const { id } = req.params
-    notesList.splice(req.params.id, 1);
-    fs.writeFileSync("./db/db.json", JSON.stringify(notesList), function (err) {
-        if (err) throw err;
-    });
-    res.json(notesList);
+    let notesArray = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
+
+    for(let i = 0; i < notesArray.length; i++){
+        if(notesArray[i].id == id){
+            console.log("Note deleted: " + JSON.stringify(notesArray[i]));
+            notesArray.splice(i, 1)
+            break;
+        }
+    }
+    fs.writeFileSync("./db/db.json", JSON.stringify(notesArray), "utf8");
+    res.json(notesArray);
 });
 
 // require("./routes/HTMLroutes")(app);
 // require("./routes/APIroutes")(app);
+app.get("*", function(req, res){
+    res.sendFile(path.join(__dirname, "/public/index.html"));
+    // console.log("home");
+});
 
 app.listen(PORT, function() {
     console.log("App listening on PORT: " + PORT);
