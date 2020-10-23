@@ -31,11 +31,21 @@ app.post("/api/notes", function (req, res) {
     //let newId = uuidv4();
     //newNote.id = newId;
 
-    let noteArr = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
+    var noteArr = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
+    newNote.id = Math.floor(Math.random()*1000)
     noteArr.push(newNote);
     fs.writeFileSync("./db/db.json", JSON.stringify(noteArr), "utf8");
     res.json(noteArr);
 
+});
+
+app.delete("/api/notes/:id", function (req, res) {
+    const { id } = req.params
+    notesList.splice(req.params.id, 1);
+    fs.writeFileSync("./db/db.json", JSON.stringify(notesList), function (err) {
+        if (err) throw err;
+    });
+    res.json(notesList);
 });
 
 // require("./routes/HTMLroutes")(app);
